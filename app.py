@@ -278,7 +278,6 @@ Return your analysis in the following format:
 # Update the node functions to use these detailed prompts
 def schema_mapping_node(state: State):
     try:
-        print("Current state:", state)  # Debugging line
         if not state.get("blogs_content"):
             return {"product_schema": []}
 
@@ -322,16 +321,24 @@ def product_comparison_node(state: State):
         if not state.get("product_schema"):
             return {"comparison": [], "best_product": {}}
 
-        # Logic to determine the best product
-        best_product = {
-            "product_name": "Example Product",
-            "justification": "This product is the best because it has excellent features."
-        }
-
-        response = product_comparison_logic(state)  # Define the actual function to get the response
+        parser = JsonOutputToolsParser(pydantic_object=ProductComparison)
+        prompt = PromptTemplate(
+            template=comparison_prompt_template,
+            input_variables=["product_data"],
+            partial_variables={"format_instructions": parser.get_format_instructions()}
+        )
+        
+        chain = prompt | llm | parser
+        response = chain.invoke({
+            "product_data": json.dumps(state['product_schema'], indent=2)
+        })
+        
+        if not response:
+            return {"comparison": [], "best_product": {}}
+            
         return {
             "comparison": response.comparisons,
-            "best_product": best_product  # Ensure this is a single dictionary
+            "best_product": response.best_product
         }
     except Exception as e:
         print(f"Product comparison error: {e}")
