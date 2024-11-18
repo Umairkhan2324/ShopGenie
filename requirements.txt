@@ -1,0 +1,8 @@
+langgraph
+langchain
+langchain-groq
+streamlit
+python-dotenv
+tavily-python
+google-api-python-client
+beautifulsoup4
