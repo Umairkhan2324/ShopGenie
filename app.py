@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 import json
-import time
+# import time
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
@@ -16,7 +16,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from langchain_community.document_loaders import WebBaseLoader
-# Load environment variables
+# # Load environment variables
 load_dotenv()
 
 # Environment variables configuration
@@ -31,6 +31,7 @@ llm = ChatGroq(
     api_key=GROQ_API_KEY,
     temperature=0.5,
 )
+llm.invoke("hi how are you?")
 
 tavily_client = TavilyClient(api_key=TAVILY_API_KEY)
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
@@ -479,7 +480,7 @@ def main():
                     4: "Preparing final results"
                 }
                 progress_text.text(stages.get(i, "Processing"))
-
+                print(event)
                 # Accumulate results
                 full_results.update(event)
 
