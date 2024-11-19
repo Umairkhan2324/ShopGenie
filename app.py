@@ -5,7 +5,7 @@ import json
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
-from langchain.output_parsers import JsonOutputToolsParser
+from langchain.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, START, END
 from tavily import TavilyClient
 from typing import List, Optional, Dict
@@ -110,11 +110,11 @@ Justification Line: Praised for its exceptional camera, advanced AI capabilities
 User Query: a phone with an amazing camera
 
 ### Example Output:
-{
+{{
   "subject": "Capture Every Moment with Google Pixel 8 Pro",
   "heading": "Discover the Power of the Ultimate Photography Smartphone",
   "justification_line": "Known for its exceptional camera quality, cutting-edge AI features, and vibrant display, the Google Pixel 8 Pro is perfect for photography enthusiasts."
-}
+}}
 
 Now generate the email recommendation based on the inputs provided.
 """
@@ -176,7 +176,7 @@ email_html_template = """
 # Helper functions
 def load_blog_content(page_url):
     try:
-        loader = WebBaseLoader(web_paths=[page_url])
+        loader = WebBaseLoader(web_paths=[page_url],bs_get_text_kwargs={"separator": " ", "strip": True})
         loaded_content = loader.load()
         return " ".join([doc.page_content for doc in loaded_content])
     except Exception as e:
@@ -282,7 +282,7 @@ def schema_mapping_node(state: State):
         if not state.get("blogs_content"):
             return {"product_schema": []}
 
-        parser = JsonOutputToolsParser(pydantic_object=ListOfSmartphoneReviews)
+        parser = JsonOutputParser(pydantic_object=ListOfSmartphoneReviews)
         prompt = PromptTemplate(
             template=schema_prompt_template,
             input_variables=["blogs_content"],
@@ -298,8 +298,8 @@ def schema_mapping_node(state: State):
                 chain = prompt | llm | parser
                 response = chain.invoke({"blogs_content": state["blogs_content"]})
                 
-                if response and len(response.reviews) > 1:
-                    return {"product_schema": response.reviews}
+                if response and len(response['products']) > 1:
+                    return {"product_schema": response['products']}
                 else:
                     print(f"Attempt {attempt}: Invalid response structure")
                     
@@ -322,7 +322,7 @@ def product_comparison_node(state: State):
         if not state.get("product_schema"):
             return {"comparison": [], "best_product": {}}
 
-        parser = JsonOutputToolsParser(pydantic_object=ProductComparison)
+        parser = JsonOutputParser(pydantic_object=ProductComparison)
         prompt = PromptTemplate(
             template=comparison_prompt_template,
             input_variables=["product_data"],
@@ -331,15 +331,15 @@ def product_comparison_node(state: State):
         
         chain = prompt | llm | parser
         response = chain.invoke({
-            "product_data": json.dumps(state['product_schema'], indent=2)
+            "product_data": json.dumps(state['product_schema'])
         })
         
         if not response:
             return {"comparison": [], "best_product": {}}
             
         return {
-            "comparison": response.comparisons,
-            "best_product": response.best_product
+            "comparison": response["comparisons"],
+            "best_product": response["best_product"]
         }
     except Exception as e:
         print(f"Product comparison error: {e}")
@@ -381,7 +381,7 @@ def send_email_node(state: State):
         if not state.get("best_product"):
             return state
 
-        parser = JsonOutputToolsParser(pydantic_object=EmailRecommendation)
+        parser = JsonOutputParser(pydantic_object=EmailRecommendation)
         prompt = PromptTemplate(
             template=email_template_prompt,
             input_variables=["product_name", "justification_line", "user_query"],
@@ -397,12 +397,12 @@ def send_email_node(state: State):
         
         html_content = email_html_template.format(
             product_name=state["best_product"]["product_name"],
-            justification=response.justification_line,
+            justification=response["justification_line"],
             youtube_link=state["youtube_link"],
-            heading=response.heading
+            heading=response["heading"]
         )
         
-        send_email(state["email"], response.subject, html_content)
+        send_email(state["email"], response['subject'], html_content)
         return state
     except Exception as e:
         print(f"Email sending error: {e}")
@@ -425,10 +425,9 @@ def build_workflow():
     builder.add_edge("tavily_search", "schema_mapping")
     builder.add_edge("schema_mapping", "product_comparison")
     builder.add_edge("product_comparison", "youtube_review")
-    builder.add_edge("youtube_review", "display")
-    builder.add_edge("display", END)
     builder.add_edge("youtube_review", "send_email")
-    builder.add_edge("send_email", END)
+    builder.add_edge("send_email", "display")
+    builder.add_edge("display", END)
     
     return builder.compile()
 
