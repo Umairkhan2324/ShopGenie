@@ -506,7 +506,9 @@ def main():
                 progress_text.text(stages.get(i, "Processing"))
                 print(event)
                 # Accumulate results
-                full_results.update(event)
+                for value in event.values():
+                    full_results.update(value)
+                # full_results.update(event)
 
             # Clear progress
             progress_container.empty()
