@@ -537,5 +537,7 @@ def main():
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
+        print("Full Results:", full_results)  # Debugging line
+
 if __name__ == "__main__":
     main()
