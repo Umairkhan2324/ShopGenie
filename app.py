@@ -402,10 +402,11 @@ def send_email_node(state: State):
             heading=response["heading"]
         )
         
+        print("Sending email to:", state["email"])  # Debugging line
         send_email(state["email"], response['subject'], html_content)
         return state
     except Exception as e:
-        print(f"Email sending error: {e}")
+        print(f"Email sending error: {e}")  # This will show the error in the terminal
         return state
 
 # Build the workflow
