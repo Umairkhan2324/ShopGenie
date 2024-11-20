@@ -123,30 +123,44 @@ email_html_template = """
 <html>
     <head>
         <style>
-            body {
+            body {{
                 font-family: Arial, sans-serif;
                 margin: 0;
                 padding: 0;
                 background-color: #f4f4f4;
-            }
-            .email-container {
+            }}
+            .email-container {{
                 max-width: 600px;
                 margin: 20px auto;
                 background-color: #ffffff;
                 border-radius: 8px;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 overflow: hidden;
-            }
-            .header {
+            }}
+            .header {{
                 background-color: #007BFF;
                 color: #ffffff;
                 padding: 20px;
                 text-align: center;
-            }
-            .content {
+            }}
+            .header h1 {{
+                margin: 0;
+                font-size: 24px;
+            }}
+            .content {{
                 padding: 20px;
-            }
-            .button {
+            }}
+            .content h2 {{
+                color: #333333;
+                font-size: 20px;
+                margin-bottom: 10px;
+            }}
+            .content p {{
+                color: #555555;
+                font-size: 16px;
+                line-height: 1.5;
+            }}
+            .button {{
                 display: inline-block;
                 margin-top: 20px;
                 background-color: #007BFF;
@@ -154,7 +168,17 @@ email_html_template = """
                 padding: 10px 20px;
                 text-decoration: none;
                 border-radius: 5px;
-            }
+            }}
+            .footer {{
+                text-align: center;
+                font-size: 14px;
+                color: #999999;
+                padding: 10px 20px;
+            }}
+            .footer a {{
+                color: #007BFF;
+                text-decoration: none;
+            }}
         </style>
     </head>
     <body>
