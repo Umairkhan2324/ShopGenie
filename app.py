@@ -5,7 +5,7 @@ import time
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
-from langchain.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, START, END
 from tavily import TavilyClient
 from typing import List, Optional, Dict
