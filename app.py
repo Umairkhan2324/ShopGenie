@@ -27,7 +27,7 @@ GMAIL_USER = os.getenv('GMAIL_USER')
 GMAIL_PASS = os.getenv('GMAIL_PASS')
 # Initialize services
 llm = ChatGroq(
-    model="llama-3.1-70b-versatile",
+    model="llama-3.3-70b-versatile",
     api_key=GROQ_API_KEY,
     temperature=0.5,
 )
