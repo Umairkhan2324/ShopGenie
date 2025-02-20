@@ -10,7 +10,7 @@ This AI agent is made to assist a customer to get best desired product specifica
 
 **Key Features**:
 - **Tavily** for web search.
-- **llama-3.1-70B** for arranging the data into specific schema and comparing products.
+- **llama3-70b-8192** for arranging the data into specific schema and comparing products.
 - Tells the **best product** among the searched ones.
 - **Youtube API** for providing the review link of the best product for self-satisfaction.
 - **SMTP** for sending mail about the best product and its review to the user.
